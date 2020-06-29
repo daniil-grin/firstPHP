@@ -6,8 +6,9 @@
 </head>
 <body>
   <?php
-  $name = $_GET['name'];
-  echo 'Добро пожаловать на наш веб-сайт, '.htmlspecialchars($name,ENT_QUOTES, 'UTF-8').'!';
+  $firstname = $_GET['firstname'];
+  $lastname = $_GET['lastname'];
+  echo 'Добро пожаловать на наш веб-сайт, '.htmlspecialchars($firstname,ENT_QUOTES, 'UTF-8').' '.htmlspecialchars($lastname,ENT_QUOTES, 'UTF-8').'!';
   ?>
 </body>
 </html>

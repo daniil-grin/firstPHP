@@ -5,6 +5,20 @@
     <title>Document</title>
   </head>
   <body>
-    <a href="name.php?name=<b>Пользователь</b>"> Привет, я Пользователь!</a>
+    <form action="name.php" method="get">
+      <div>
+        <label for="firstname"
+          >Имя: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <input type="text" name="firstname" id="firstname" />
+        </label>
+      </div>
+      <br />
+      <div>
+        <label for="lastname"
+          >Фамилия: <input type="text" name="lastname" id="lastname" />
+        </label>
+      </div>
+      <div><input type="submit" value="Поехали!" /></div>
+    </form>
   </body>
 </html>
