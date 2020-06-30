@@ -1,35 +1,15 @@
 <?php
-//Волшебные ковычки
-if (get_magic_quotes_gpc()) {
-    $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
-    while (list($key, $val) = each($process)) {
-        foreach ($val as $k => $v) {
-            unset($process[$key][$k]);
-            if (is_array($v)) {
-                $process[$key][stripslashes($k)] = $v;
-                $process[] = &$process[$key][stripslashes($k)];
-            } else {
-                $process[$key][stripslashes($k)] = stripslashes($v);
-            }
-        }
-    }
-    unset($process);
-}
+// Волшебные ковычки
+include_once $_SERVER['DOCUMENT_ROOT'] . '/includes/magicquotes.inc.php';
+
 // Форма добавления шутки
 if (isset($_GET['addjoke'])) {
     include 'form.html.php';
     exit();
 }
 // Подключение к БД
-try {
-    $pdo = new PDO('mysql:host=localhost;dbname=int_joke', 'jokesuser', '123');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec('SET NAMES "utf8"');
-} catch (PDOException $e) {
-    $output = 'Невозможно подключиться к серверу баз данных: ' . $e->getMessage();
-    include 'error.html.php';
-    exit();
-}
+include $_SERVER['DOCUMENT_ROOT'] . '/includes/db.inc.php';
+
 // Добавление шутки
 if (isset($_POST['joketext'])) {
     try {
