@@ -7,24 +7,37 @@ include_once $_SERVER['DOCUMENT_ROOT'] .
 include_once $_SERVER['DOCUMENT_ROOT'] .
     '/includes/access.inc.php';
 
-if(!userIsLoggedIn()){
+if (!userIsLoggedIn()) {
     include '../login.html.php';
     exit();
 }
-if(!userHasRole('Администратор учетных записей')){
+if (!userHasRole('Администратор учетных записей')) {
     $error = 'Доступ к этой странице имеет только администратор учетных записей';
     include '../accessdenied.html.php';
     exit();
 }
 // Форма добавления автора
 if (isset($_GET['add'])) {
+    include $_SERVER['DOCUMENT_ROOT'] . '/includes/db.inc.php';
     $pageTitle = 'Новый автор';
     $action = 'addform';
     $name = '';
     $email = '';
     $id = '';
     $button = 'Добавить автора';
-
+    // Формируем список ролей
+    try {
+        $result = $pdo->query('SELECT id, description FROM role');
+    } catch (PDOException $e) {
+        $error = 'Ошибка при получнии списка ролей';
+    }
+    foreach ($result as $row) {
+        $roles[] = array(
+            'id' => $row['id'],
+            'description' => $row['description'],
+            'selected' => false,
+        );
+    }
     include 'form.html.php';
     exit();
 }
@@ -46,7 +59,41 @@ if (isset($_GET['addform'])) {
         include 'error.html.php';
         exit();
     }
+    $authotid = $pdo->lastInsertId();
+    if ($_POST['password'] != '') {
+        $password = md5($_POST['password'] . 'int_joke');
+        try {
+            $sql = 'UPDATE author SET
+            password = :password
+            WHERE id = :id';
+            $s = $pdo->prepare($sql);
+            $s->bindValue(':password', $password);
+            $s->bindValue(':id', $authotid);
+            $s->execute();
+        } catch (PDOException $e) {
+            $error = 'Ошибка при назначении пароля для автора';
+            include 'error.html.php';
+            exit();
 
+        }
+    }
+    if (isset($_POST['roles'])) {
+        foreach ($_POST['roles'] as $role) {
+            try {
+                $sql = 'INSERT INTO authorrole SET
+                authorid = :authorid,
+                roleid = :roleid';
+                $s = $pdo->prepare($sql);
+                $s->bindValue(':authorid', $authotid);
+                $s->bindValue(':roleid', $role);
+                $s->execute();
+            } catch (PDOException $e) {
+                $error = 'Ошибка при назначении роли для автора';
+                include 'error.html.php';
+                exit();
+            }
+        }
+    }
     header('Location: .');
     exit();
 }
@@ -74,7 +121,36 @@ if (isset($_POST['action']) and $_POST['action'] == 'Редактировать'
     $email = $row['email'];
     $id = $row['id'];
     $button = 'Обновить информацию об авторе';
-
+    // Получаем список ролей, назначенных для данного автора
+    try {
+        $sql = 'SELECT roleid FROM authorrole WHERE authorid = :id';
+        $s = $pdo->prepare($sql);
+        $s->bindValue(':id', $id);
+        $s->execute();
+    } catch (PDOException $e) {
+        $error = 'Ошибка при получнении списка назначенных ролей.';
+        include 'error.html.php';
+        exit();
+    }
+    $selectedRoles = array();
+    foreach ($s as $row) {
+        $selectedRoles[] = $row['roleid'];
+    }
+    // ФОрмируем список всех ролей
+    try {
+        $result = $pdo->query('SELECT id, description FROM role');
+    } catch (PDOException $e) {
+        $error = 'Ошибка при получении списка ролей';
+        include 'error.html.php';
+        exit();
+    }
+    foreach ($result as $row) {
+        $roles[] = array(
+            'id' => $row['id'],
+            'description' => $row['description'],
+            'selected' => in_array($row['id'],
+                $selectedRoles));
+    }
     include 'form.html.php';
     exit();
 }
@@ -98,6 +174,52 @@ if (isset($_GET['editform'])) {
         include 'error.html.php';
         exit();
     }
+    if ($_POST['password'] != '') {
+        $password = md5($_POST['password'] . 'int_joke');
+        try {
+            $sql = 'UPDATE author SET
+            password = :password
+            WHERE id = :id';
+            $s = $pdo->prepare($sql);
+            $s->bindValue(':password', $password);
+            $s->bindValue(':id', $_POST['id']);
+            $s - execute();
+        } catch (PDOException $e) {
+            $error = 'Ошибка при назначении пароля автору';
+            include 'error.html.php';
+            exit();
+        }
+    }
+    try
+    {
+        $sql = 'DELETE FROM authorrole WHERE authorid = :id';
+        $s = $pdo->prepare($sql);
+        $s->bindValue(':id', $_POST['id']);
+        $s->execute();
+    } catch (PDOException $e) {
+        $error = 'Ошибка при удалении неактуальной записи о ролях автора.';
+        include 'error.html.php';
+        exit();
+    }
+
+    if (isset($_POST['roles'])) {
+        foreach ($_POST['roles'] as $role) {
+            try
+            {
+                $sql = 'INSERT INTO authorrole SET
+                authorid = :authorid,
+                roleid = :roleid';
+                $s = $pdo->prepare($sql);
+                $s->bindValue(':authorid', $_POST['id']);
+                $s->bindValue(':roleid', $role);
+                $s->execute();
+            } catch (PDOException $e) {
+                $error = 'Ошибка при назначении автору заданных ролей.';
+                include 'error.html.php';
+                exit();
+            }
+        }
+    }
 
     header('Location: .');
     exit();
@@ -106,6 +228,18 @@ if (isset($_GET['editform'])) {
 if (isset($_POST['action']) and $_POST['action'] == 'Удалить') {
     // Подключаемся к БД
     include $_SERVER['DOCUMENT_ROOT'] . '/includes/db.inc.php';
+    // Delete role assignments for this author
+    try
+    {
+        $sql = 'DELETE FROM authorrole WHERE authorid = :id';
+        $s = $pdo->prepare($sql);
+        $s->bindValue(':id', $_POST['id']);
+        $s->execute();
+    } catch (PDOException $e) {
+        $error = 'Ошибка при удалении ролей автора.';
+        include 'error.html.php';
+        exit();
+    }
 
     // Получаем шутки автора
     try
