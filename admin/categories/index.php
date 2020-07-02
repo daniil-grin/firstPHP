@@ -1,7 +1,21 @@
 <?php
+
 // Волшебные ковычки
 include_once $_SERVER['DOCUMENT_ROOT'] .
     '/includes/magicquotes.inc.php';
+
+include_once $_SERVER['DOCUMENT_ROOT'] .
+    '/includes/access.inc.php';
+
+if (!userIsLoggedIn()) {
+    include '../login.html.php';
+    exit();
+}
+if (!userHasRole('Администратор сайта')) {
+    $error = 'Доступ к этой странице имеет только администратор сайта';
+    include '../accessdenied.html.php';
+    exit();
+}
 // Форма добавления категории
 if (isset($_GET['add'])) {
     $pageTitle = 'Новая категория';

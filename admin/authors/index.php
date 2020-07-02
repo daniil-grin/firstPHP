@@ -1,5 +1,22 @@
 <?php
-// Форма автора
+
+// Волшебные ковычки
+include_once $_SERVER['DOCUMENT_ROOT'] .
+    '/includes/magicquotes.inc.php';
+
+include_once $_SERVER['DOCUMENT_ROOT'] .
+    '/includes/access.inc.php';
+
+if(!userIsLoggedIn()){
+    include '../login.html.php';
+    exit();
+}
+if(!userHasRole('Администратор учетных записей')){
+    $error = 'Доступ к этой странице имеет только администратор учетных записей';
+    include '../accessdenied.html.php';
+    exit();
+}
+// Форма добавления автора
 if (isset($_GET['add'])) {
     $pageTitle = 'Новый автор';
     $action = 'addform';

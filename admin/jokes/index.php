@@ -1,7 +1,21 @@
 <?php
+
 // Волшебные ковычки
 include_once $_SERVER['DOCUMENT_ROOT'] .
     '/includes/magicquotes.inc.php';
+
+include_once $_SERVER['DOCUMENT_ROOT'] .
+    '/includes/access.inc.php';
+
+if (!userIsLoggedIn()) {
+    include '../login.html.php';
+    exit();
+}
+if (!userHasRole('Редактор')) {
+    $error = 'Доступ к этой странице имеет только редактор';
+    include '../accessdenied.html.php';
+    exit();
+}
 
 // Форма добавления шутки
 if (isset($_GET['add'])) {

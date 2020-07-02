@@ -29,5 +29,6 @@
     <?php endif;?>
     <p><a href="?">Новый поиск</a></p>
     <p><a href="..">Вернуться на главную</a></p>
+    <?php include '../logout.inc.html.php'; ?>
   </body>
 </html>

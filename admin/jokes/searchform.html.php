@@ -1,6 +1,6 @@
 <?php
 include_once $_SERVER['DOCUMENT_ROOT'] .
-    '/includes/helpers.inc.php'; ?>
+    '/includes/helpers.inc.php';?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -17,8 +17,8 @@ include_once $_SERVER['DOCUMENT_ROOT'] .
         <select name="author" id="author">
           <option value="">Любой автор</option>
           <?php foreach ($authors as $author): ?>
-            <option value="<?php htmlout($author['id']); ?>"><?php htmlout($author['name']); ?></option>
-          <?php endforeach; ?>
+            <option value="<?php htmlout($author['id']);?>"><?php htmlout($author['name']);?></option>
+          <?php endforeach;?>
         </select>
       </div>
       <div>
@@ -26,9 +26,9 @@ include_once $_SERVER['DOCUMENT_ROOT'] .
         <select name="category" id="category">
           <option value="">Любая категория</option>
           <?php foreach ($categories as $category): ?>
-            <option value="<?php htmlout($category['id']); ?>"><?php
-                htmlout($category['name']); ?></option>
-          <?php endforeach; ?>
+            <option value="<?php htmlout($category['id']);?>"><?php
+htmlout($category['name']);?></option>
+          <?php endforeach;?>
         </select>
       </div>
       <div>
@@ -41,5 +41,6 @@ include_once $_SERVER['DOCUMENT_ROOT'] .
       </div>
     </form>
     <p><a href="..">Вернуться на главную страницу</a></p>
+    <?php include '../logout.inc.html.php';?>
   </body>
 </html>
