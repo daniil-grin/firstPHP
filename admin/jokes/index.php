@@ -240,6 +240,7 @@ if (isset($_GET['editform'])) {
     exit();
 }
 
+//Удаление шутки
 if (isset($_POST['action']) and $_POST['action'] == 'Удалить') {
     include $_SERVER['DOCUMENT_ROOT'] . '/includes/db.inc.php';
 

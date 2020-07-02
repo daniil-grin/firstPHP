@@ -13,7 +13,7 @@
         <tr><th>Текст шутки</th><th>Действия</th></tr>
         <?php foreach ($jokes as $joke): ?>
         <tr>
-          <td><?php htmlout($joke['text']);?></td>
+          <td><?php markdownhtml($joke['text']);?></td>
           <td>
             <form action="?" method="post">
               <div>
@@ -27,7 +27,7 @@
         <?php endforeach;?>
       </table>
     <?php endif;?>
-    <p><a href="?">New search</a></p>
-    <p><a href="..">Return to JMS home</a></p>
+    <p><a href="?">Новый поиск</a></p>
+    <p><a href="..">Вернуться на главную</a></p>
   </body>
 </html>
